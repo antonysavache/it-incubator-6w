@@ -1,0 +1,30 @@
+import {UsersQueryRepository} from "../../domain/infrastructures/repositories/users-query.repository";
+import {UsersCommandRepository} from "../../domain/infrastructures/repositories/users-command.repository";
+import {UserSpecification} from "../../domain/specifications/user.specification";
+import {UserCreateDTO, UserViewModel} from "../../domain/interfaces/user.interface";
+import {UserEntity} from "../../domain/user.entity";
+import {Result} from "../../../../shared/infrastructures/result";
+
+export class CreateUserUseCase {
+    constructor(
+        private usersQueryRepository: UsersQueryRepository,
+        private usersCommandRepository: UsersCommandRepository,
+        private userSpecification: UserSpecification
+    ) {}
+
+    async execute(dto: UserCreateDTO): Promise<Result<UserViewModel>> {
+        try {
+            const user = await UserEntity.create(
+                dto,
+                this.userSpecification,
+                this.usersQueryRepository
+            );
+
+            await this.usersCommandRepository.create(user.toDatabaseModel());
+
+            return Result.ok(user.toViewModel());
+        } catch (error) {
+            return Result.fail(error.message);
+        }
+    }
+}
