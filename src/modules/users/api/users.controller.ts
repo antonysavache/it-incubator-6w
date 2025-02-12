@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
-import { CreateUserUseCase } from "../use-cases/create-user.use-case";
-import { GetUsersUseCase } from "../use-cases/get-users.use-case";
-import { QueryParams } from "../../../../shared/models/common.model";
+import { CreateUserUseCase } from "../application/use-cases/create-user.use-case";
+import { GetUsersUseCase } from "../application/use-cases/get-users.use-case";
+import { QueryParams } from "../../../shared/models/common.model";
 
 export class UsersController {
     constructor(

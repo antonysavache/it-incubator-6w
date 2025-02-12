@@ -2,7 +2,7 @@
 import {Collection, Filter, ObjectId, OptionalUnlessRequiredId, UpdateFilter} from 'mongodb';
 import {getDatabase} from "../db/mongo-db";
 
-export abstract class BaseCommandRepository<T, CreateModel extends OptionalUnlessRequiredId<T>> {
+export abstract class BaseCommandRepository<T, CreateModel> {
     protected collection: Collection<T> | null = null;
 
     constructor(protected collectionName: string) {}
@@ -21,8 +21,8 @@ export abstract class BaseCommandRepository<T, CreateModel extends OptionalUnles
 
     async create(data: CreateModel): Promise<string> {
         this.checkInit();
-        await this.collection.insertOne(data, { forceServerObjectId: false });
-        return data._id.toString();
+        await this.collection.insertOne(data as OptionalUnlessRequiredId<T>);
+        return data['_id'].toString();
     }
 
     async update(id: string, data: Partial<CreateModel>): Promise<boolean> {

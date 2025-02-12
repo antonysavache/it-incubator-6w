@@ -1,6 +1,6 @@
 import { Router } from "express";
-import {usersController} from "./application/users-composition";
-import {authMiddleware} from "../../shared/infrastructures/middlewares/auth.middleware";
+import {usersController} from "../application/users-composition";
+import {authMiddleware} from "../../../shared/infrastructures/middlewares/auth.middleware";
 
 export const usersRouter = Router();
 
