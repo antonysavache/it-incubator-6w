@@ -1,9 +1,10 @@
-import { ObjectId } from 'mongodb';
 import {UserCreateDTO, UserDatabaseModel, UserViewModel} from "./interfaces/user.interface";
 import {UserSpecification} from "./specifications/user.specification";
 import {UsersQueryRepository} from "./infrastructures/repositories/users-query.repository";
+import {Result} from "../../../shared/infrastructures/result";
+import {ObjectId} from "mongodb";
 import {SETTINGS} from "../../../configs/settings";
-import bcrypt from 'bcrypt';
+import bcrypt from "bcrypt";
 
 export class UserEntity {
     constructor(
@@ -18,7 +19,7 @@ export class UserEntity {
         userData: UserCreateDTO,
         specification: UserSpecification,
         userQueryRepository: UsersQueryRepository
-    ): Promise<UserEntity> {
+    ): Promise<Result<UserEntity>> {
         const validationResult = specification.validateCreateUser(
             userData.login,
             userData.email,
@@ -26,29 +27,33 @@ export class UserEntity {
         );
 
         if (validationResult.isFailure()) {
-            throw new Error(validationResult.getError());
+            return Result.fail(validationResult.getError());
         }
 
         const isLoginUnique = await userQueryRepository.findByFilter({ login: userData.login });
         const isEmailUnique = await userQueryRepository.findByFilter({ email: userData.email });
 
         if (isLoginUnique) {
-            throw new Error('Login already exists');
+            return Result.fail({
+                errorsMessages: [{ message: 'Login already exists', field: 'login' }]
+            });
         }
 
         if (isEmailUnique) {
-            throw new Error('Email already exists');
+            return Result.fail({
+                errorsMessages: [{ message: 'Email already exists', field: 'email' }]
+            });
         }
 
         const passwordHash = this.hashPassword(userData.password);
 
-        return new UserEntity(
+        return Result.ok(new UserEntity(
             new ObjectId(),
             userData.login,
             userData.email,
             passwordHash,
             new Date().toISOString()
-        );
+        ));
     }
 
     toDatabaseModel(): UserDatabaseModel {

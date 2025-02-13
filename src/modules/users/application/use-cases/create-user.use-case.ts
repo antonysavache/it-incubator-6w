@@ -13,18 +13,19 @@ export class CreateUserUseCase {
     ) {}
 
     async execute(dto: UserCreateDTO): Promise<Result<UserViewModel>> {
-        try {
-            const user = await UserEntity.create(
-                dto,
-                this.userSpecification,
-                this.usersQueryRepository
-            );
+        const userResult = await UserEntity.create(
+            dto,
+            this.userSpecification,
+            this.usersQueryRepository
+        );
 
-            await this.usersCommandRepository.create(user.toDatabaseModel());
-
-            return Result.ok(user.toViewModel());
-        } catch (error) {
-            return Result.fail(error.message);
+        if (userResult.isFailure()) {
+            return Result.fail(userResult.getError());
         }
+
+        const user = userResult.getValue();
+        await this.usersCommandRepository.create(user.toDatabaseModel());
+
+        return Result.ok(user.toViewModel());
     }
 }
