@@ -1,12 +1,12 @@
-import {PostsQueryRepository} from "../../modules/posts/infrastructure/repositories/posts-query.repository";
-import {PostsCommandRepository} from "../../modules/posts/infrastructure/repositories/posts-command.repository";
-import {BlogsQueryRepository} from "../../modules/blogs/infrastructure/repositories/blogs-query.repository";
-import {PostsController} from "../../modules/posts/api/posts.controller";
-import {GetPostsUseCase} from "../../modules/posts/application/use-cases/get-posts.use-case";
-import {CreatePostUseCase} from "../../modules/posts/application/use-cases/create-post.use-case";
-import {GetPostByIdUseCase} from "../../modules/posts/application/use-cases/get-post-by-id.use-case";
-import {UpdatePostUseCase} from "../../modules/posts/application/use-cases/update-post.use-case";
-import {DeletePostUseCase} from "../../modules/posts/application/use-cases/delete-post.use-case";
+import { PostsQueryRepository } from "../../modules/posts/infrastructure/repositories/posts-query.repository";
+import { PostsCommandRepository } from "../../modules/posts/infrastructure/repositories/posts-command.repository";
+import { GetPostsUseCase } from "../../modules/posts/application/use-cases/get-posts.use-case";
+import { CreatePostUseCase } from "../../modules/posts/application/use-cases/create-post.use-case";
+import { GetPostByIdUseCase } from "../../modules/posts/application/use-cases/get-post-by-id.use-case";
+import { UpdatePostUseCase } from "../../modules/posts/application/use-cases/update-post.use-case";
+import { DeletePostUseCase } from "../../modules/posts/application/use-cases/delete-post.use-case";
+import { PostsController } from "../../modules/posts/api/posts.controller";
+import { BlogsQueryRepository } from "../../modules/blogs/infrastructure/repositories/blogs-query.repository";
 
 // Repositories
 export const postsQueryRepository = new PostsQueryRepository();

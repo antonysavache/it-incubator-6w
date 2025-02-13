@@ -1,4 +1,3 @@
-// src/shared/infrastructure/repositories/basequery.repository.ts
 import {Collection, Filter, ObjectId, WithId} from 'mongodb';
 import {PageResponse, PaginationQueryParams, SearchParam, ToViewModel} from "../../models/common.model";
 import {getDatabase} from "../db/mongo-db";
