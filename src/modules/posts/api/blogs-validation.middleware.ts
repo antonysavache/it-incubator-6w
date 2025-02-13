@@ -1,5 +1,5 @@
 import {body} from 'express-validator';
-import {blogsQueryRepository} from "../../../configs/compositions/blogs.composition";
+import {blogsQueryRepository} from "../../../configs/compositions/repositories";
 
 export const blogsValidationMiddleware = [
     body('title')

@@ -1,6 +1,3 @@
-// src/configs/compositions/blogs.composition.ts
-import { BlogsQueryRepository } from "../../modules/blogs/infrastructure/repositories/blogs-query.repository";
-import { BlogsCommandRepository } from "../../modules/blogs/infrastructure/repositories/blogs-command.repository";
 import { GetBlogsUseCase } from "../../modules/blogs/application/use-cases/get-blogs.use-case";
 import { CreateBlogUseCase } from "../../modules/blogs/application/use-cases/create-blog.use-case";
 import { GetBlogByIdUseCase } from "../../modules/blogs/application/use-cases/get-blog-by-id.use-case";
@@ -9,13 +6,12 @@ import { DeleteBlogUseCase } from "../../modules/blogs/application/use-cases/del
 import { BlogsController } from "../../modules/blogs/api/blogs.controller";
 import { GetBlogPostsUseCase } from "../../modules/blogs/application/use-cases/get-blog-posts.use-case";
 import { CreateBlogPostUseCase } from "../../modules/blogs/application/use-cases/create-blog-post.use-case";
-import { PostsQueryRepository } from "../../modules/posts/infrastructure/repositories/posts-query.repository";
-import { PostsCommandRepository } from "../../modules/posts/infrastructure/repositories/posts-command.repository";
-
-export const blogsQueryRepository = new BlogsQueryRepository();
-export const blogsCommandRepository = new BlogsCommandRepository();
-export const postsQueryRepository = new PostsQueryRepository();
-export const postsCommandRepository = new PostsCommandRepository();
+import {
+    blogsCommandRepository,
+    blogsQueryRepository,
+    postsCommandRepository,
+    postsQueryRepository
+} from "./repositories";
 
 // Use Cases
 export const getBlogsUseCase = new GetBlogsUseCase(blogsQueryRepository);
