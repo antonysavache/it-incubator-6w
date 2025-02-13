@@ -3,13 +3,11 @@ import {authMiddleware} from "../../../shared/infrastructures/middlewares/auth.m
 import {usersController} from "../../../configs/compositions/users-composition";
 
 export const usersRouter = Router();
-
+usersRouter.use(authMiddleware);
 usersRouter.get('/',
-    authMiddleware,
     usersController.getUsers
 );
 
 usersRouter.post('/',
-    authMiddleware,
     usersController.createUser
 );

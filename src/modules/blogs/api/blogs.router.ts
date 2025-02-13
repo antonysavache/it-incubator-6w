@@ -36,8 +36,8 @@ blogsRouter.get('/:id/posts',
 );
 
 blogsRouter.post('/:id/posts',
-    postsValidation,
     authMiddleware,
+    postsValidation,
     handleValidationErrors,
     blogsController.createBlogPost
 );
