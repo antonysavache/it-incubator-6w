@@ -12,6 +12,6 @@ usersRouter.post('/',
     usersController.createUser
 );
 
-usersRouter.delete('/',
+usersRouter.delete('/:id',
     usersController.deleteUser
 )
