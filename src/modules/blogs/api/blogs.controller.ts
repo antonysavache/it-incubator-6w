@@ -64,15 +64,22 @@ export class BlogsController {
     }
 
     createBlogPost = async (req: Request<{ id: string }, {}, PostCreateDTO>, res: Response) => {
-        const result = await this.createBlogPostUseCase.execute(req.params.id, {
-            ...req.body,
-            blogId: req.params.id
-        });
+        const { title, content, shortDescription } = req.body;
+
+        const result = await this.createBlogPostUseCase.execute(
+            req.params.id,
+            { title, content, shortDescription }
+        );
 
         if (result.isFailure()) {
-            res.status(400).json({
-                errorsMessages: [{ message: result.getError(), field: 'none' }]
-            });
+            const error = result.getError();
+            if (error === 'Blog not found') {
+                res.sendStatus(404);
+            } else {
+                res.status(400).json({
+                    errorsMessages: [{ message: error, field: 'none' }]
+                });
+            }
         } else {
             res.status(201).json(result.getValue());
         }

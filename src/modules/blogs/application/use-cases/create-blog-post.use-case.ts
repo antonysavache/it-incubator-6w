@@ -1,7 +1,7 @@
 import {BlogsQueryRepository} from "../../infrastructure/repositories/blogs-query.repository";
-import {Result} from "../../../../shared/infrastructures/result";
 import {PostsCommandRepository} from "../../../posts/infrastructure/repositories/posts-command.repository";
 import {PostCreateDTO, PostViewModel} from "../../../posts/domain/interfaces/post.interface";
+import {Result} from "../../../../shared/infrastructures/result";
 import {PostEntity} from "../../../posts/domain/post.entity";
 
 export class CreateBlogPostUseCase {
@@ -10,7 +10,7 @@ export class CreateBlogPostUseCase {
         private postsCommandRepository: PostsCommandRepository
     ) {}
 
-    async execute(blogId: string, dto: PostCreateDTO): Promise<Result<PostViewModel>> {
+    async execute(blogId: string, dto: Omit<PostCreateDTO, 'blogId' | 'blogName'>): Promise<Result<PostViewModel>> {
         const blog = await this.blogsQueryRepository.findById(blogId);
 
         if (!blog) {
@@ -23,8 +23,7 @@ export class CreateBlogPostUseCase {
             blogName: blog.name
         });
 
-        await this.postsCommandRepository.create(post.toDatabaseModel());
-
+        const id = await this.postsCommandRepository.create(post.toDatabaseModel());
         return Result.ok(post.toViewModel());
     }
 }
