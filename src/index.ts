@@ -1,12 +1,11 @@
 import { app } from "./app";
 import { SETTINGS } from "./configs/settings";
 import { connectToDatabase } from "./shared/infrastructures/db/mongo-db";
-import {usersQueryRepository} from "./configs/compositions/auth.composition";
 import {
     blogsCommandRepository,
     blogsQueryRepository,
     postsCommandRepository,
-    postsQueryRepository, usersCommandRepository
+    postsQueryRepository, usersCommandRepository, usersQueryRepository
 } from "./configs/compositions/repositories";
 
 async function startApp() {
