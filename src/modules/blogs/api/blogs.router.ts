@@ -2,7 +2,7 @@ import { Router } from 'express';
 import {authMiddleware} from "../../../shared/infrastructures/middlewares/auth.middleware";
 import {blogsController} from "../../../configs/compositions/blogs.composition";
 import {handleValidationErrors} from "../../../shared/infrastructures/middlewares/error-handler.middleware";
-import {blogsValidationMiddleware} from "../../posts/api/blogs-validation.middleware";
+import {postsValidation} from "../../posts/api/posts-validation.middleware";
 import {blogsValidation} from "./blogs-validation.middleware";
 
 
@@ -11,8 +11,8 @@ export const blogsRouter = Router();
 blogsRouter.get('/', blogsController.getBlogs);
 
 blogsRouter.post('/',
-    authMiddleware,
     blogsValidation,
+    authMiddleware,
     handleValidationErrors,
     blogsController.createBlog
 );
@@ -20,8 +20,8 @@ blogsRouter.post('/',
 blogsRouter.get('/:id', blogsController.getBlogById);
 
 blogsRouter.put('/:id',
-    authMiddleware,
     blogsValidation,
+    authMiddleware,
     handleValidationErrors,
     blogsController.updateBlog
 );
@@ -36,8 +36,8 @@ blogsRouter.get('/:id/posts',
 );
 
 blogsRouter.post('/:id/posts',
+    postsValidation,
     authMiddleware,
-    blogsValidationMiddleware,
     handleValidationErrors,
     blogsController.createBlogPost
 );
