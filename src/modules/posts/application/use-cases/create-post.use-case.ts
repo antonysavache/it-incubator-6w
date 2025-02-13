@@ -13,15 +13,18 @@ export class CreatePostUseCase {
     async execute(dto: PostCreateDTO): Promise<Result<PostViewModel>> {
         const errors: { message: string; field: string }[] = [];
 
-        const blog = await this.blogsQueryRepository.findById(dto.blogId);
-        if (!blog) {
-            errors.push({ message: 'Blog not found', field: 'blogId' });
-        }
-
         if (dto.shortDescription && dto.shortDescription.length > 100) {
             errors.push({
                 message: 'Short description should not exceed 100 characters',
                 field: 'shortDescription'
+            });
+        }
+
+        const blog = await this.blogsQueryRepository.findById(dto.blogId);
+        if (!blog) {
+            errors.push({
+                message: 'Blog not found',
+                field: 'blogId'
             });
         }
 

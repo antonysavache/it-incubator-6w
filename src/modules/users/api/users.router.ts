@@ -11,3 +11,7 @@ usersRouter.get('/',
 usersRouter.post('/',
     usersController.createUser
 );
+
+usersRouter.delete('/',
+    usersController.deleteUser
+)
