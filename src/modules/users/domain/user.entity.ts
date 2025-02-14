@@ -1,17 +1,19 @@
+import {ObjectId} from "mongodb";
+import {Login} from "../../../shared/value-objects/login.value-object";
+import {Email} from "../../../shared/value-objects/email.value-object";
+import {Password} from "../../../shared/value-objects/password.value-object";
 import {UserCreateDTO, UserDatabaseModel, UserViewModel} from "./interfaces/user.interface";
 import {UserSpecification} from "./specifications/user.specification";
 import {UsersQueryRepository} from "./infrastructures/repositories/users-query.repository";
 import {Result} from "../../../shared/infrastructures/result";
-import {ObjectId} from "mongodb";
 import {SETTINGS} from "../../../configs/settings";
-import bcrypt from "bcrypt";
 
 export class UserEntity {
-    constructor(
+    private constructor(
         private readonly id: ObjectId,
-        private readonly login: string,
-        private readonly email: string,
-        private readonly passwordHash: string,
+        private readonly login: Login,
+        private readonly email: Email,
+        private readonly password: Password,
         private readonly createdAt: string
     ) {}
 
@@ -20,18 +22,27 @@ export class UserEntity {
         specification: UserSpecification,
         userQueryRepository: UsersQueryRepository
     ): Promise<Result<UserEntity>> {
-        const validationResult = specification.validateCreateUser(
-            userData.login,
-            userData.email,
-            userData.password
-        );
-
-        if (validationResult.isFailure()) {
-            return Result.fail(validationResult.getError());
+        const loginResult = Login.create(userData.login);
+        if (loginResult.isFailure()) {
+            return Result.fail(loginResult.getError());
         }
 
-        const isLoginUnique = await userQueryRepository.findByFilter({ login: userData.login });
-        const isEmailUnique = await userQueryRepository.findByFilter({ email: userData.email });
+        const emailResult = Email.create(userData.email);
+        if (emailResult.isFailure()) {
+            return Result.fail(emailResult.getError());
+        }
+
+        const passwordResult = Password.create(userData.password);
+        if (passwordResult.isFailure()) {
+            return Result.fail(passwordResult.getError());
+        }
+
+        const isLoginUnique = await userQueryRepository.findByFilter({
+            login: loginResult.getValue().getValue()
+        });
+        const isEmailUnique = await userQueryRepository.findByFilter({
+            email: emailResult.getValue().getValue()
+        });
 
         if (isLoginUnique) {
             return Result.fail({
@@ -45,13 +56,13 @@ export class UserEntity {
             });
         }
 
-        const passwordHash = this.hashPassword(userData.password);
+        const hashedPassword = await passwordResult.getValue().hash(SETTINGS.SALT_ROUNDS);
 
         return Result.ok(new UserEntity(
             new ObjectId(),
-            userData.login,
-            userData.email,
-            passwordHash,
+            loginResult.getValue(),
+            emailResult.getValue(),
+            Password.createHashed(hashedPassword),
             new Date().toISOString()
         ));
     }
@@ -59,9 +70,9 @@ export class UserEntity {
     toDatabaseModel(): UserDatabaseModel {
         return {
             _id: this.id,
-            login: this.login,
-            email: this.email,
-            passwordHash: this.passwordHash,
+            login: this.login.getValue(),
+            email: this.email.getValue(),
+            passwordHash: this.password.getHashedValue(),
             createdAt: this.createdAt
         };
     }
@@ -69,13 +80,13 @@ export class UserEntity {
     toViewModel(): UserViewModel {
         return {
             id: this.id.toString(),
-            login: this.login,
-            email: this.email,
+            login: this.login.getValue(),
+            email: this.email.getValue(),
             createdAt: this.createdAt
         };
     }
 
-    private static hashPassword(password: string): string {
-        return bcrypt.hashSync(password, SETTINGS.SALT_ROUNDS);
+    async validatePassword(password: string): Promise<boolean> {
+        return this.password.compareWith(password);
     }
 }
