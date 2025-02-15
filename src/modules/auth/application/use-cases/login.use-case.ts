@@ -12,12 +12,8 @@ export class LoginUseCase {
         private tokenCommandRepository: TokenCommandRepository
     ) {}
 
-    async execute(dto: LoginDTO): Promise<Result<LoginResponseDTO>> {
+    async execute(dto: LoginDTO): Promise<Result<{ accessToken: string }>> {
         const { loginOrEmail, password } = dto;
-
-        if (!loginOrEmail || !password) {
-            return Result.fail('All fields are required');
-        }
 
         const user = await this.usersQueryRepository.findByFilter({
             $or: [
@@ -31,7 +27,6 @@ export class LoginUseCase {
         }
 
         const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
-
         if (!isPasswordValid) {
             return Result.fail('Invalid credentials');
         }

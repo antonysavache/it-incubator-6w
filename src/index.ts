@@ -5,7 +5,7 @@ import {
     blogsCommandRepository,
     blogsQueryRepository,
     postsCommandRepository,
-    postsQueryRepository, usersCommandRepository, usersQueryRepository
+    postsQueryRepository, tokenCommandRepository, usersCommandRepository, usersQueryRepository
 } from "./configs/compositions/repositories";
 
 async function startApp() {
@@ -18,6 +18,7 @@ async function startApp() {
         postsCommandRepository.init();
         usersQueryRepository.init();
         usersCommandRepository.init();
+        tokenCommandRepository.init();
 
         app.listen(SETTINGS.PORT, () => {
             console.log(`Server started on port: ${SETTINGS.PORT}`);

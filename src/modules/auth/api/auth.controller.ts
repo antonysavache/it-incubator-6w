@@ -5,15 +5,15 @@ import {LoginDTO} from "../application/interfaces/auth.interface";
 export class AuthController {
     constructor(private loginUseCase: LoginUseCase) {}
 
-    login = async (req: Request<{}, {}, LoginDTO>, res: Response): Promise<void> => {
+    login = async (req: Request<{}, {}, LoginDTO>, res: Response) => {
         const result = await this.loginUseCase.execute(req.body);
 
         if (result.isFailure()) {
-            console.log(123)
-            res.sendStatus(401);
-            return;
+            return res.sendStatus(401);
         }
 
-        res.sendStatus(204);
+        return res.status(200).json({
+            accessToken: result.getValue().accessToken
+        });
     }
 }
