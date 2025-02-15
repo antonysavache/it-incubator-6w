@@ -9,6 +9,7 @@ export class AuthController {
         const result = await this.loginUseCase.execute(req.body);
 
         if (result.isFailure()) {
+            console.log(123)
             res.sendStatus(401);
             return;
         }

@@ -13,6 +13,7 @@ export const SETTINGS = {
         TESTING_DELETE: '/testing/all-data',
         BLOGS: '/blogs',
         POSTS: '/posts',
+        COMMENTS: '/comments',
         USERS: '/users',
         AUTH: '/auth'
     }
