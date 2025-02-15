@@ -7,6 +7,7 @@ import {UserSpecification} from "./specifications/user.specification";
 import {UsersQueryRepository} from "./infrastructures/repositories/users-query.repository";
 import {Result} from "../../../shared/infrastructures/result";
 import {SETTINGS} from "../../../configs/settings";
+import {ErrorMessage} from "../../../shared/models/common.model";
 
 export class UserEntity {
     private constructor(
@@ -22,20 +23,23 @@ export class UserEntity {
         specification: UserSpecification,
         userQueryRepository: UsersQueryRepository
     ): Promise<Result<UserEntity>> {
+        const errors: ErrorMessage[] = [];
+
+        const loginValidation = Login.validate(userData.login);
+        const emailValidation = Email.validate(userData.email);
+        const passwordValidation = Password.validate(userData.password);
+
+        errors.push(...loginValidation.errors);
+        errors.push(...emailValidation.errors);
+        errors.push(...passwordValidation.errors);
+
+        if (errors.length > 0) {
+            return Result.fail({ errorsMessages: errors });
+        }
+
         const loginResult = Login.create(userData.login);
-        if (loginResult.isFailure()) {
-            return Result.fail(loginResult.getError());
-        }
-
         const emailResult = Email.create(userData.email);
-        if (emailResult.isFailure()) {
-            return Result.fail(emailResult.getError());
-        }
-
         const passwordResult = Password.create(userData.password);
-        if (passwordResult.isFailure()) {
-            return Result.fail(passwordResult.getError());
-        }
 
         const isLoginUnique = await userQueryRepository.findByFilter({
             login: loginResult.getValue().getValue()
@@ -44,16 +48,24 @@ export class UserEntity {
             email: emailResult.getValue().getValue()
         });
 
-        if (isLoginUnique) {
-            return Result.fail({
-                errorsMessages: [{ message: 'Login already exists', field: 'login' }]
-            });
-        }
+        if (isLoginUnique || isEmailUnique) {
+            const uniquenessErrors: ErrorMessage[] = [];
 
-        if (isEmailUnique) {
-            return Result.fail({
-                errorsMessages: [{ message: 'Email already exists', field: 'email' }]
-            });
+            if (isLoginUnique) {
+                uniquenessErrors.push({
+                    message: 'Login already exists',
+                    field: 'login'
+                });
+            }
+
+            if (isEmailUnique) {
+                uniquenessErrors.push({
+                    message: 'Email already exists',
+                    field: 'email'
+                });
+            }
+
+            return Result.fail({ errorsMessages: uniquenessErrors });
         }
 
         const hashedPassword = await passwordResult.getValue().hash(SETTINGS.SALT_ROUNDS);
