@@ -1,10 +1,11 @@
 import { LoginUseCase } from "../../modules/auth/application/use-cases/login.use-case";
 import { AuthController } from "../../modules/auth/api/auth.controller";
-import {usersQueryRepository} from "./repositories";
+import {tokenCommandRepository, usersQueryRepository} from "./repositories";
 
 
 export const loginUseCase = new LoginUseCase(
-    usersQueryRepository
+    usersQueryRepository,
+    tokenCommandRepository
 );
 
 export const authController = new AuthController(
