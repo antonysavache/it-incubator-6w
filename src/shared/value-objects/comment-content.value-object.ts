@@ -1,6 +1,6 @@
-import {ValidationResult} from "../models/validation-result.model";
-import {ErrorMessage} from "../models/common.model";
-import {Result} from "../infrastructures/result";
+import { ValidationResult } from "../models/validation-result.model";
+import { ErrorMessage } from "../models/common.model";
+import { Result } from "../infrastructures/result";
 
 export class CommentContent {
     private constructor(private readonly value: string) {}
@@ -13,11 +13,13 @@ export class CommentContent {
                 message: 'Content is required',
                 field: 'content'
             });
-        } else if (content.length > 300) {
-            errors.push({
-                message: 'Content should not exceed 300 characters',
-                field: 'content'
-            });
+        } else {
+            if (content.length < 20 || content.length > 300) {
+                errors.push({
+                    message: 'Content should be between 20 and 300 characters',
+                    field: 'content'
+                });
+            }
         }
 
         return {

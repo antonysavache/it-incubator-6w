@@ -1,15 +1,7 @@
-import {ObjectId} from "mongodb";
+import { ObjectId } from "mongodb";
 
 export interface CommentCreateDTO {
     content: string;
-}
-
-export interface CommentCreateModel {
-    postId: string;
-    content: string;
-    userId: string;
-    userLogin: string;
-    createdAt: string;
 }
 
 export interface CommentViewModel {
@@ -29,4 +21,10 @@ export interface CommentDatabaseModel {
     userId: string;
     userLogin: string;
     createdAt: string;
+}
+
+export interface CommentFullViewModel extends CommentViewModel {
+    postId: string;
+    userId: string;
+    userLogin: string;
 }

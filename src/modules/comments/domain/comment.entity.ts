@@ -1,7 +1,7 @@
-import {ObjectId} from "mongodb";
-import {CommentContent} from "../../../shared/value-objects/comment-content.value-object";
-import {Result} from "../../../shared/infrastructures/result";
-import {CommentDatabaseModel, CommentViewModel} from "./interfaces/comment.interface";
+import { ObjectId } from "mongodb";
+import { CommentContent } from "../../../shared/value-objects/comment-content.value-object";
+import { Result } from "../../../shared/infrastructures/result";
+import { CommentDatabaseModel, CommentViewModel } from "./interfaces/comment.interface";
 
 export class CommentEntity {
     private constructor(
@@ -34,26 +34,13 @@ export class CommentEntity {
         ));
     }
 
-    static update(
-        entity: CommentEntity,
-        content: string
-    ): Result<CommentEntity> {
-        const contentResult = CommentContent.create(content);
-        if (contentResult.isFailure()) {
-            return Result.fail(contentResult.getError());
-        }
-
-        entity.content = contentResult.getValue();
-        return Result.ok(entity);
-    }
-
     toDatabaseModel(): CommentDatabaseModel {
         return {
             _id: this.id,
-            postId: this.postId,
             content: this.content.getValue(),
             userId: this.userId,
             userLogin: this.userLogin,
+            postId: this.postId,
             createdAt: this.createdAt
         };
     }

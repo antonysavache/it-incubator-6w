@@ -27,7 +27,8 @@ export const deleteCommentUseCase = new DeleteCommentUseCase(
 );
 
 export const getCommentUseCase = new GetCommentUseCase(
-    commentsQueryRepository
+    commentsQueryRepository,
+    postsQueryRepository
 );
 
 export const commentsController = new CommentsController(
