@@ -6,6 +6,7 @@ import { jwtAuthMiddleware } from "../../../shared/infrastructures/middlewares/j
 
 export const commentsRouter = Router();
 
+// Post-specific comment routes
 commentsRouter.post('/posts/:postId/comments',
     jwtAuthMiddleware,
     commentValidation,
@@ -17,18 +18,19 @@ commentsRouter.get('/posts/:postId/comments',
     commentsController.getComments
 );
 
-commentsRouter.put('/:commentId',
+// Comment-specific routes
+commentsRouter.put('/comments/:commentId',
     jwtAuthMiddleware,
     commentValidation,
     handleValidationErrors,
     commentsController.updateComment
 );
 
-commentsRouter.delete('/:commentId',
+commentsRouter.delete('/comments/:commentId',
     jwtAuthMiddleware,
     commentsController.deleteComment
 );
 
-commentsRouter.get('/:commentId',
+commentsRouter.get('/comments/:commentId',
     commentsController.getComment
 );
