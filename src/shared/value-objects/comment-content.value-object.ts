@@ -13,13 +13,15 @@ export class CommentContent {
                 message: 'Content is required',
                 field: 'content'
             });
-        } else {
-            if (content.length < 20 || content.length > 300) {
-                errors.push({
-                    message: 'Content should be between 20 and 300 characters',
-                    field: 'content'
-                });
-            }
+            return { isValid: false, errors };
+        }
+
+        const trimmedContent = content.trim();
+        if (trimmedContent.length < 20 || trimmedContent.length > 300) {
+            errors.push({
+                message: 'Content should be between 20 and 300 characters',
+                field: 'content'
+            });
         }
 
         return {
