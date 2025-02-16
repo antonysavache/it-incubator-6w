@@ -1,29 +1,30 @@
 import { Request, Response } from 'express';
-import {CreateCommentUseCase} from "../application/use-cases/create-comment.use-case";
-import {UpdateCommentUseCase} from "../application/use-cases/update-comment.use-case";
-import {DeleteCommentUseCase} from "../application/use-cases/delete-comment.use-case";
-import {GetCommentUseCase} from "../application/use-cases/get-comment.use-case";
-import {RequestWithUser} from "../../../shared/types/express";
+import { CreateCommentUseCase } from "../application/use-cases/create-comment.use-case";
+import { UpdateCommentUseCase } from "../application/use-cases/update-comment.use-case";
+import { DeleteCommentUseCase } from "../application/use-cases/delete-comment.use-case";
+import { GetCommentUseCase } from "../application/use-cases/get-comment.use-case";
+import { RequestWithUser } from "../../../shared/types/express";
+import { CommentsQueryRepository } from "../infrastructure/repositories/comments-query.repository";
 
 interface CommentBodyModel {
     content: string;
 }
-
 
 export class CommentsController {
     constructor(
         private createCommentUseCase: CreateCommentUseCase,
         private updateCommentUseCase: UpdateCommentUseCase,
         private deleteCommentUseCase: DeleteCommentUseCase,
-        private getCommentUseCase: GetCommentUseCase
+        private getCommentUseCase: GetCommentUseCase,
+        private commentsQueryRepository: CommentsQueryRepository
     ) {}
 
     createComment = async (req: RequestWithUser<{ postId: string }, CommentBodyModel>, res: Response) => {
         const result = await this.createCommentUseCase.execute(
             req.params.postId,
             req.body.content,
-            req.user!.id,
-            req.user!.login
+            req.user.id,
+            req.user.login
         );
 
         if (result.isFailure()) {
@@ -31,18 +32,26 @@ export class CommentsController {
             if (error === 'Post not found') {
                 return res.sendStatus(404);
             }
-            return res.status(400).json({
-                errorsMessages: [{ message: error, field: 'content' }]
-            });
+            if (typeof error === 'string') {
+                return res.status(400).json({
+                    errorsMessages: [{ message: error, field: 'content' }]
+                });
+            }
+            return res.status(400).json(error);
         }
 
         return res.status(201).json(result.getValue());
     }
 
+    getComments = async (req: Request<{ postId: string }>, res: Response) => {
+        const comments = await this.commentsQueryRepository.findByPostId(req.params.postId);
+        return res.status(200).json(comments);
+    }
+
     updateComment = async (req: RequestWithUser<{ commentId: string }, CommentBodyModel>, res: Response) => {
         const result = await this.updateCommentUseCase.execute(
             req.params.commentId,
-            req.user!.id,
+            req.user.id,
             req.body.content
         );
 
@@ -54,9 +63,12 @@ export class CommentsController {
             if (error === 'Forbidden') {
                 return res.sendStatus(403);
             }
-            return res.status(400).json({
-                errorsMessages: [{ message: error, field: 'content' }]
-            });
+            if (typeof error === 'string') {
+                return res.status(400).json({
+                    errorsMessages: [{ message: error, field: 'content' }]
+                });
+            }
+            return res.status(400).json(error);
         }
 
         return res.sendStatus(204);
@@ -65,7 +77,7 @@ export class CommentsController {
     deleteComment = async (req: RequestWithUser<{ commentId: string }>, res: Response) => {
         const result = await this.deleteCommentUseCase.execute(
             req.params.commentId,
-            req.user!.id
+            req.user.id
         );
 
         if (result.isFailure()) {
