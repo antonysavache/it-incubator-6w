@@ -1,6 +1,7 @@
-import {CommentsCommandRepository} from "../../infrastructure/repositories/comments-command.repository";
-import {CommentsQueryRepository} from "../../infrastructure/repositories/comments-query.repository";
-import {Result} from "../../../../shared/infrastructures/result";
+import { CommentsCommandRepository } from "../../infrastructure/repositories/comments-command.repository";
+import { CommentsQueryRepository } from "../../infrastructure/repositories/comments-query.repository";
+import { Result } from "../../../../shared/infrastructures/result";
+import { CommentContent } from "../../../../shared/value-objects/comment-content.value-object";
 
 export class UpdateCommentUseCase {
     constructor(
@@ -13,8 +14,12 @@ export class UpdateCommentUseCase {
         userId: string,
         content: string
     ): Promise<Result<void>> {
-        const comment = await this.commentsQueryRepository.findById(id);
+        const contentResult = CommentContent.create(content);
+        if (contentResult.isFailure()) {
+            return Result.fail(contentResult.getError());
+        }
 
+        const comment = await this.commentsQueryRepository.findById(id);
         if (!comment) {
             return Result.fail('Comment not found');
         }
@@ -23,7 +28,10 @@ export class UpdateCommentUseCase {
             return Result.fail('Forbidden');
         }
 
-        const isUpdated = await this.commentsCommandRepository.update(id, { content });
+        const isUpdated = await this.commentsCommandRepository.update(id, {
+            content: contentResult.getValue().getValue()
+        });
+
         if (!isUpdated) {
             return Result.fail('Failed to update comment');
         }

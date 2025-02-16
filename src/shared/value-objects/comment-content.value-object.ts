@@ -17,9 +17,16 @@ export class CommentContent {
         }
 
         const trimmedContent = content.trim();
-        if (trimmedContent.length < 20 || trimmedContent.length > 300) {
+        if (trimmedContent.length < 20) {
             errors.push({
-                message: 'Content should be between 20 and 300 characters',
+                message: 'Content length must be at least 20 characters',
+                field: 'content'
+            });
+        }
+
+        if (trimmedContent.length > 300) {
+            errors.push({
+                message: 'Content length must not exceed 300 characters',
                 field: 'content'
             });
         }

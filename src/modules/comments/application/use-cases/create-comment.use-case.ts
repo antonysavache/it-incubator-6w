@@ -3,7 +3,8 @@ import { PostsQueryRepository } from "../../../posts/infrastructure/repositories
 import { Result } from "../../../../shared/infrastructures/result";
 import { CommentViewModel } from "../../domain/interfaces/comment.interface";
 import { CommentsQueryRepository } from "../../infrastructure/repositories/comments-query.repository";
-import {ObjectId} from "mongodb";
+import { CommentContent } from "../../../../shared/value-objects/comment-content.value-object";
+import { ObjectId } from "mongodb";
 
 export class CreateCommentUseCase {
     constructor(
@@ -18,6 +19,12 @@ export class CreateCommentUseCase {
         userId: string,
         userLogin: string
     ): Promise<Result<CommentViewModel>> {
+        // Validate content first
+        const contentResult = CommentContent.create(content);
+        if (contentResult.isFailure()) {
+            return Result.fail(contentResult.getError());
+        }
+
         const post = await this.postsQueryRepository.findById(postId);
         if (!post) {
             return Result.fail('Post not found');
@@ -26,7 +33,7 @@ export class CreateCommentUseCase {
         const commentData = {
             _id: new ObjectId(),
             postId,
-            content,
+            content: contentResult.getValue().getValue(),
             userId,
             userLogin,
             createdAt: new Date().toISOString()
